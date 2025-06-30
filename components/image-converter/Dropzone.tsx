@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 
-export default function Dropzone() {
-    const [files, setFiles] = useState<File[]>([]);
+type Props = {
+  onDrop: (files: File[]) => void;
+};
 
-    const onDrop = (acceptedFiles: File[]) => {
-        setFiles(acceptedFiles);
-    };
-
+export default function Dropzone({ onDrop }: Props) {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: {
             "image/*": [],
@@ -30,7 +27,7 @@ export default function Dropzone() {
                     <span className="text-blue-500 font-semibold">이미지를 여기에 놓으세요...</span>
                 ) : (
                     <>
-                        <strong className="text-blue-600">클릭하거나 드래그</strong>하여 이미지를 업로드하세요
+                    <strong className="text-blue-600">클릭하거나 드래그</strong>하여 이미지를 업로드하세요
                     </>
                 )}
                 </p>
