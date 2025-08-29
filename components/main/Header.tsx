@@ -6,15 +6,15 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between p-4 bg-white shadow-md dark:bg-gray-800">
       {/* 왼쪽: 서비스 이름 */}
-      <div className="flex-1">
+      <div className="flex-none">
         <Link href="/">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Toolverse</h1>
         </Link>
       </div>
 
       {/* 중앙: 메뉴 */}
-      <nav className="flex-1 hidden md:flex justify-center">
-        <ul className="flex space-x-6">
+      <nav className="flex-1 hidden md:flex justify-center md:flex-none">
+        <ul className="flex space-x-2 md:space-x-4">
           {/* TOOL_CATEGORIES 배열을 순회하며 메뉴 항목 생성 */}
           {TOOL_CATEGORIES.map((category) => (
             <li key={category.id}>
@@ -28,7 +28,7 @@ const Header = () => {
       </nav>
 
       {/* 오른쪽: 다크 모드 토글 (임시) */}
-      <div className="flex-1 flex justify-end">
+      <div className="flex-none flex justify-end">
         <button className="p-2 rounded-full bg-gray-200 dark:bg-gray-700">
           <svg
             xmlns="http://www.w3.org/2000/svg"
