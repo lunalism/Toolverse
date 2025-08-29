@@ -1,10 +1,10 @@
+// toolverse/app/layout.tsx
+
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/main/Header";
 import Footer from "@/components/main/Footer";
-
-const inter = Inter({ subsets: ["latin"] });
+import { pretendard } from "@/pretendard"; // pretendard 폰트 임포트
 
 export const metadata: Metadata = {
   title: "Toolverse",
@@ -18,7 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
+      {/* pretendard 폰트 클래스 적용 */}
+      <body className={pretendard.className}>
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-grow p-8">
