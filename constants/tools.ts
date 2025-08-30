@@ -5,7 +5,8 @@ export const TOOLS = [
     description: 'JPG, PNG, WEBP 등 다양한 이미지 포맷을 변환합니다.',
     category: 'image-tools',
     icon: '🖼️',
-    isNew: false, // 이 툴도 이제 NEW가 아니겠지?
+    isNew: false,
+    path: '/image-tools/image-converter',
   },
   {
     id: 'image-resizer',
@@ -14,6 +15,7 @@ export const TOOLS = [
     category: 'image-tools',
     icon: '📐',
     isNew: false,
+    path: '/image-tools/image-resizer',
   },
   {
     id: 'text-transformer',
@@ -22,6 +24,7 @@ export const TOOLS = [
     category: 'text',
     icon: '✍️',
     isNew: false,
+    path: '/text/text-transformer',
   },
   {
     id: 'word-counter',
@@ -29,7 +32,8 @@ export const TOOLS = [
     description: '공백 포함/미포함 글자수와 단어수를 세어줍니다.',
     category: 'text',
     icon: '🔢',
-    isNew: true, // 이 툴만 NEW!
+    isNew: true,
+    path: '/text/word-counter',
   },
   {
     id: 'd-day-counter',
@@ -38,6 +42,7 @@ export const TOOLS = [
     category: 'date-time',
     icon: '🗓️',
     isNew: false,
+    path: '/date-time/d-day-counter',
   },
   {
     id: 'age-calculator',
@@ -46,5 +51,6 @@ export const TOOLS = [
     category: 'date-time',
     icon: '🎂',
     isNew: false,
+    path: '/date-time/age-calculator',
   },
 ];
