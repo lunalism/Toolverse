@@ -1,9 +1,18 @@
 import Link from 'next/link';
 import { TOOL_CATEGORIES } from '@/constants/tool-categories';
 import { TOOLS } from '@/constants/tools';
-import ToolCard from '@/components/main/ToolCard'; // 새로 만든 컴포넌트 임포트
+import ToolCard from '@/components/main/ToolCard'; // 경로 확인해줘!
 
 export default function Home() {
+  // isNew가 true인 툴을 먼저 가져와
+  const newTools = TOOLS.filter(tool => tool.isNew);
+  // isNew가 false인 툴을 가져와
+  const otherTools = TOOLS.filter(tool => !tool.isNew);
+
+  // newTools를 먼저 배치하고, 그 다음에 otherTools를 배치
+  // 그리고 총 6개까지만 보이도록 잘라내기
+  const visibleTools = [...newTools, ...otherTools].slice(0, 6);
+
   return (
     <section className="text-center my-16">
       <h2 className="text-5xl font-extrabold text-gray-900 mb-4 dark:text-white">
@@ -16,12 +25,14 @@ export default function Home() {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        {TOOLS.map((tool) => (
+        {visibleTools.map((tool) => (
           <ToolCard
             key={tool.id}
             id={tool.id}
             name={tool.name}
             description={tool.description}
+            icon={tool.icon}
+            isNew={tool.isNew} // isNew props를 제대로 넘겨줘야 해!
           />
         ))}
       </div>
