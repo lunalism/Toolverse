@@ -18,6 +18,15 @@ export const TOOLS = [
     path: '/image-tools/image-resizer',
   },
   {
+    id: 'text-comparator',
+    name: '텍스트 비교 도구',
+    description: '두 개의 텍스트를 비교하여 차이점을 찾습니다.',
+    category: 'text',
+    icon: '🔍',
+    isNew: true, // 이 툴에 NEW 배지 표시
+    path: '/text/text-comparator',
+  },
+  {
     id: 'text-transformer',
     name: '텍스트 변환 도구',
     description: '대소문자 변환, 줄바꿈/공백 제거 등 텍스트를 정리합니다.',
