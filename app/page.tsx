@@ -1,10 +1,11 @@
 // app/page.tsx
+
 import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
-    <div className="container mt-10">
-      <section className="text-center py-20">
+    <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center">
+      <div className="container text-center">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
           모든 도구를 한 곳에서.
         </h1>
@@ -14,7 +15,7 @@ export default function HomePage() {
         <Button className="mt-6" size="lg">
           도구 둘러보기
         </Button>
-      </section>
+      </div>
     </div>
   );
 }
