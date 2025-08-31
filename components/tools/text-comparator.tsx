@@ -6,34 +6,42 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation'; // <-- useRouter import
+import { useRouter } from 'next/navigation';
 
 export function TextComparator() {
-  const router = useRouter(); // <-- 라우터 훅 초기화
-  
-  // 텍스트 상태 관리
+  const router = useRouter();
+
+  // 텍스트 상태를 빈 문자열로 초기화합니다.
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
 
-  // 페이지 로딩 시 localStorage의 이전 값들을 제거하여 초기 상태를 보장합니다.
+  // 컴포넌트가 브라우저에 마운트된 후에 localStorage에서 값을 불러옵니다.
   useEffect(() => {
-    localStorage.removeItem('text1');
-    localStorage.removeItem('text2');
-  }, []);
+    const storedText1 = localStorage.getItem('text1');
+    const storedText2 = localStorage.getItem('text2');
 
-  // '비교하기' 버튼 클릭 핸들러
+    if (storedText1) {
+      setText1(storedText1);
+    }
+    if (storedText2) {
+      setText2(storedText2);
+    }
+  }, []); // 마운트 시 한 번만 실행되도록 빈 배열을 전달합니다.
+
+  // 텍스트가 변경될 때마다 localStorage에 저장합니다.
+  useEffect(() => {
+    localStorage.setItem('text1', text1);
+  }, [text1]);
+
+  useEffect(() => {
+    localStorage.setItem('text2', text2);
+  }, [text2]);
+  
   const handleCompareClick = () => {
-    // 텍스트가 모두 비어있으면 동작하지 않습니다.
     if (!text1.trim() || !text2.trim()) {
       alert("비교할 텍스트를 입력해주세요.");
       return;
     }
-    
-    // localStorage에 텍스트를 저장합니다.
-    localStorage.setItem('text1', text1);
-    localStorage.setItem('text2', text2);
-    
-    // 결과 페이지로 이동합니다.
     router.push('/tools/text/text-comparator/results');
   };
 
@@ -61,8 +69,6 @@ export function TextComparator() {
           비교하기
         </Button>
       </div>
-
-      {/* 비교 결과 영역은 새로운 페이지에서 보여줄 것이므로 제거합니다. */}
     </Card>
   );
 }

@@ -1,4 +1,4 @@
-// app/tools/text/text-comparator/results/page.tsx
+// src/components/tools/text-comparator/results/page.tsx
 
 "use client";
 
@@ -37,6 +37,9 @@ export default function TextComparatorResultsPage() {
   };
   
   const handleStartOver = () => {
+    // localStorage를 초기화합니다.
+    localStorage.removeItem('text1');
+    localStorage.removeItem('text2');
     router.push('/tools/text/text-comparator');
   };
 
@@ -45,15 +48,14 @@ export default function TextComparatorResultsPage() {
       <Card className="w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">비교 결과</CardTitle>
-          {/* 범례를 표시하는 부분 */}
           <div className="flex items-center space-x-4 text-sm font-semibold">
             <div className="flex items-center space-x-1">
               <span className="h-2 w-2 rounded-full bg-red-500"></span>
-              <span>원본문</span>
+              <span>삭제됨</span>
             </div>
             <div className="flex items-center space-x-1">
               <span className="h-2 w-2 rounded-full bg-green-500"></span>
-              <span>비교문</span>
+              <span>추가됨</span>
             </div>
           </div>
         </CardHeader>
