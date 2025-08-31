@@ -30,7 +30,7 @@ export function Header() {
                     <NavigationMenu>
                         <NavigationMenuList className="flex gap-1">
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
+                                <Link href="/tools/text" className={navigationMenuTriggerStyle()}>
                                 텍스트 도구
                                 </Link>
                             </NavigationMenuItem>
