@@ -4,22 +4,21 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { differenceInYears, isValid } from 'date-fns';
+import { DatePicker } from '@/components/ui/date-picker';
+import { differenceInYears } from 'date-fns';
 
 export function AgeCalculator() {
-  const [birthdate, setBirthdate] = useState('');
+  const [birthdate, setBirthdate] = useState<Date | undefined>(undefined);
   const [age, setAge] = useState<string | null>(null);
 
   useEffect(() => {
-    // birthdate가 유효한 날짜 형식인지 확인합니다.
-    if (birthdate && isValid(new Date(birthdate))) {
-      const birthDateObj = new Date(birthdate);
+    // birthdate가 유효한 날짜 객체인지 확인합니다.
+    if (birthdate) {
       const today = new Date();
       
       // date-fns의 differenceInYears 함수를 사용해 나이를 계산합니다.
-      const calculatedAge = differenceInYears(today, birthDateObj);
+      const calculatedAge = differenceInYears(today, birthdate);
       
       setAge(`${calculatedAge}세`);
     } else {
@@ -38,12 +37,7 @@ export function AgeCalculator() {
           {/* 입력 섹션 */}
           <div className="md:w-1/2 flex flex-col gap-4">
             <Label htmlFor="birthdate">생년월일</Label>
-            <Input
-              id="birthdate"
-              type="date"
-              value={birthdate}
-              onChange={(e) => setBirthdate(e.target.value)}
-            />
+            <DatePicker date={birthdate} setDate={setBirthdate} />
           </div>
 
           {/* 결과 섹션 */}
@@ -51,7 +45,7 @@ export function AgeCalculator() {
             {age !== null ? (
               <p className="text-2xl font-bold">{age}</p>
             ) : (
-              <p className="text-muted-foreground">생년월일을 입력해주세요.</p>
+              <p className="text-muted-foreground">생년월일을 선택해주세요.</p>
             )}
           </div>
         </div>
