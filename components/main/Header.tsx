@@ -40,7 +40,7 @@ export function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
+                                <Link href="/tools/security" className={navigationMenuTriggerStyle()}>
                                 보안 도구
                                 </Link>
                             </NavigationMenuItem>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function HomePage() {
   return (
-    <div className="min-h-[calc(100vh-56px)] flex flex-col items-center justify-center">
+    <div className="min-h-[calc(90vh-56px)] flex flex-col items-center justify-center">
       <div className="container text-center">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
           모든 도구를 한 곳에서.
