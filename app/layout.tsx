@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Header } from "@/components/main/Header";
 import { Footer } from "@/components/main/Footer";
+import { ThemeProvider } from "@/components/main/theme-provider";
 
 // Pretendard 폰트 설정
 const pretendard = localFont({
@@ -23,13 +24,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={pretendard.className}>
+    <html lang="ko" className={pretendard.className} suppressHydrationWarning>
       <body>
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </div>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -6,13 +6,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-
-// TODO: 다크 모드 토글 기능 추가
-const toggleDarkMode = () => {
-    console.log("다크 모드 토글!");
-};
+import { useTheme } from "next-themes";
 
 export function Header() {
+    const { setTheme, theme } = useTheme();
+
+    const toggleTheme = () => {
+        setTheme(theme === "light" ? "dark" : "light");
+    }
+
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="relative flex h-14 items-center justify-between px-6 md:px-8 max-w-[1440px] mx-auto">
@@ -78,7 +80,7 @@ export function Header() {
 
                 {/* 오른쪽: 다크 모드 토글 */}
                 <div className="flex items-center">
-                    <Button variant="ghost" className="h-9 w-9" onClick={toggleDarkMode}>
+                    <Button variant="ghost" className="h-9 w-9" onClick={toggleTheme}>
                         <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                         <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                         <span className="sr-only">Toggle theme</span>
