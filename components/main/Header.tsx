@@ -35,7 +35,7 @@ export function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
+                                <Link href="/tools/date-time" className={navigationMenuTriggerStyle()}>
                                 날짜/시간 도구
                                 </Link>
                             </NavigationMenuItem>
