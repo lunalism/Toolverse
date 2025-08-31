@@ -13,6 +13,7 @@ export default function TextToolsPage() {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                {/* 글자 수 세기 */}
                 <Card>
                     <CardHeader>
                         <CardTitle>글자 수 세기</CardTitle>
@@ -22,6 +23,21 @@ export default function TextToolsPage() {
                             실시간으로 글자 수, 단어 수, 줄 수를 계산해 드립니다.
                         </p>
                         <Link href="/tools/text/word-counter">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                {/* 글자 비교 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>글자 비교</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            두 텍스트의 차이점을 찾아 시각적으로 보여줍니다.
+                        </p>
+                        <Link href="/tools/text/text-comparator">
                             <Button>도구 사용하기</Button>
                         </Link>
                     </CardContent>
