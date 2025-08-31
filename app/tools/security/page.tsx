@@ -13,6 +13,7 @@ export default function SecurityToolsPage() {
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                {/* 암호 생성기 카드 */}
                 <Card>
                     <CardHeader>
                         <CardTitle>복잡한 암호 생성기</CardTitle>
@@ -22,6 +23,21 @@ export default function SecurityToolsPage() {
                             안전한 무작위 암호를 생성해 드립니다.
                         </p>
                         <Link href="/tools/security/password-generator">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                {/* QR 코드 생성기 카드 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>QR 코드 생성기</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            텍스트나 URL을 QR 코드로 변환해 드립니다.
+                        </p>
+                        <Link href="/tools/security/qr-generator">
                             <Button>도구 사용하기</Button>
                         </Link>
                     </CardContent>
