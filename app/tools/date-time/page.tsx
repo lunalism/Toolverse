@@ -42,6 +42,21 @@ export default function DateTimeToolsPage() {
                         </Link>
                     </CardContent>
                 </Card>
+
+                {/* 날짜 차이 계산기 카드 추가 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>날짜 차이 계산기</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            두 날짜 사이의 기간을 정확하게 계산해 드립니다. (해외 체류 포함)
+                        </p>
+                        <Link href="/tools/date-time/date-difference-calculator">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
