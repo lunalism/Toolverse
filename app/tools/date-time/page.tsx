@@ -13,6 +13,7 @@ export default function DateTimeToolsPage() {
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+                {/* 날짜 계산기 카드 추가 */}
                 <Card>
                     <CardHeader>
                         <CardTitle>나이 계산기</CardTitle>
@@ -22,6 +23,21 @@ export default function DateTimeToolsPage() {
                             생년월일을 입력해 현재 나이를 계산해 드립니다.
                         </p>
                         <Link href="/tools/date-time/age-calculator">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+
+                {/* 디데이 계산기 카드 추가 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>디데이 계산기</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            특정 날짜까지 남은 기간을 계산해 드립니다.
+                        </p>
+                        <Link href="/tools/date-time/d-day-calculator">
                             <Button>도구 사용하기</Button>
                         </Link>
                     </CardContent>
