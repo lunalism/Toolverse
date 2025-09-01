@@ -43,7 +43,20 @@ export default function TextToolsPage() {
                     </CardContent>
                 </Card>
 
-                {/* 다른 텍스트 도구들이 여기에 추가될 예정입니다. */}
+                {/* 텍스트 변환기 카드 추가 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>텍스트 변환기</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            텍스트의 대소문자나 형식을 간편하게 변환합니다.
+                        </p>
+                        <Link href="/tools/text/text-converter">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
