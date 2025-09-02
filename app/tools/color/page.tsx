@@ -27,6 +27,21 @@ export default function ColorToolsPage() {
                         </Link>
                     </CardContent>
                 </Card>
+
+                {/* 컬러 팔레트 조합 카드 추가 */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>컬러 팔레트 조합</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground mb-4">
+                            기준 색상을 바탕으로 조화로운 색상 팔레트를 만듭니다.
+                        </p>
+                        <Link href="/tools/color/palette-generator">
+                            <Button>도구 사용하기</Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
