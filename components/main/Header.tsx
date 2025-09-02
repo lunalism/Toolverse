@@ -50,7 +50,7 @@ export function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
+                                <Link href="/tools/color" className={navigationMenuTriggerStyle()}>
                                 색상 도구
                                 </Link>
                             </NavigationMenuItem>
