@@ -1,162 +1,106 @@
-// src/components/tools/palette-generator.tsx
+// src/components/tools/palette-generator.tsx (전체 코드)
 
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { colord, extend, Colord } from 'colord';
+import harmonies from 'colord/plugins/harmonies';
+import { Plus, Minus, Lock, Unlock, Copy, Heart, Eye } from 'lucide-react';
 
-// --- 핵심 색상 변환 로직 (라이브러리 없이 직접 구현) ---
+extend([harmonies]);
 
-// HEX 색상을 HSL 색상으로 변환하는 함수
-function hexToHsl(hex: string) {
-  let r = parseInt(hex.substring(1, 3), 16) / 255;
-  let g = parseInt(hex.substring(3, 5), 16) / 255;
-  let b = parseInt(hex.substring(5, 7), 16) / 255;
-
-  let max = Math.max(r, g, b);
-  let min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  let l = (max + min) / 2;
-
-  if (max !== min) {
-    let d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-
-  return [h * 360, s * 100, l * 100];
+interface ColorBlockProps {
+  color: string;
+  onColorChange: (newColor: string) => void;
+  onRemove: () => void;
+  onLock: () => void;
+  isLocked: boolean;
 }
 
-// HSL 색상을 HEX 색상으로 변환하는 함수
-function hslToHex(h: number, s: number, l: number) {
-  h /= 360;
-  s /= 100;
-  l /= 100;
-  
-  let r, g, b;
+// 각 색상 블록을 위한 독립적인 컴포넌트
+function ColorBlock({ color, onColorChange, onRemove, onLock, isLocked }: ColorBlockProps) {
+  const getContrastTextColor = (hex: string) => colord(hex).isLight() ? 'text-black' : 'text-white';
+  const colorName = "색상 이름"; // TODO: 색상 이름 로직 추가
 
-  if (s === 0) {
-    r = g = b = l; // 단색조
-  } else {
-    const hue2rgb = (p: number, q: number, t: number) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    };
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1 / 3);
-    g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1 / 3);
-  }
+  return (
+    <div
+      className="relative flex-1 flex flex-col justify-end p-4 transition-all duration-300 group"
+      style={{ backgroundColor: color }}
+    >
+      <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute top-4 left-4 right-4">
+        <Button size="icon" variant="ghost" className="text-white hover:text-red-500" onClick={onRemove}>
+          <Minus className="h-4 w-4" />
+        </Button>
+        <Button size="icon" variant="ghost" className="text-white hover:text-gray-300" onClick={onLock}>
+          {isLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+        </Button>
+      </div>
 
-  const toHex = (c: number) => {
-    const hex = Math.round(c * 255).toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      <div className="flex flex-col items-center">
+        <span className="font-mono text-lg font-bold transition-colors duration-300" style={{ color: getContrastTextColor(color) === 'text-white' ? 'white' : 'black' }}>
+          {color.toUpperCase()}
+        </span>
+        <span className="font-normal text-sm font-sans transition-colors duration-300" style={{ color: getContrastTextColor(color) === 'text-white' ? 'white' : 'black' }}>
+          {colorName}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 export function PaletteGenerator() {
-  const [baseColor, setBaseColor] = useState('#10b981');
-  const [palette, setPalette] = useState<string[]>([]);
-  const [paletteType, setPaletteType] = useState('analogous');
+  const [palette, setPalette] = useState([
+    { id: 1, hex: '#87A878', isLocked: false },
+    { id: 2, hex: '#B0BC98', isLocked: false },
+    { id: 3, hex: '#BCC4A9', isLocked: false },
+    { id: 4, hex: '#C7CCB9', isLocked: false },
+    { id: 5, hex: '#CAE2BC', isLocked: false },
+    { id: 6, hex: '#DBF9B8', isLocked: false },
+  ]);
 
-  const generatePalette = () => {
-    // 6자리 HEX 코드가 아닐 경우 오류 처리
-    if (!/^#[0-9A-F]{6}$/i.test(baseColor)) {
-        alert('유효한 6자리 HEX 색상 코드를 입력해주세요.');
-        setPalette([]);
-        return;
-    }
-    
-    let [h, s, l] = hexToHsl(baseColor);
-    let newPalette: string[] = [];
-
-    // 팔레트 유형에 따라 HSL 값을 조작합니다.
-    if (paletteType === 'analogous') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 30) % 360, s, l),
-        hslToHex((h - 30 + 360) % 360, s, l),
-      ];
-    } else if (paletteType === 'complementary') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 180) % 360, s, l),
-      ];
-    } else if (paletteType === 'triadic') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 120) % 360, s, l),
-        hslToHex((h - 120 + 360) % 360, s, l),
-      ];
-    }
-    
+  const generateRandomPalette = () => {
+    const newPalette = palette.map(color => {
+      if (color.isLocked) return color;
+      return { ...color, hex: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}` };
+    });
     setPalette(newPalette);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        generateRandomPalette();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [palette]);
+
+  const handleRemove = (id: number) => {
+    setPalette(palette.filter(c => c.id !== id));
+  };
+  const handleLock = (id: number) => {
+    setPalette(palette.map(c => c.id === id ? { ...c, isLocked: !c.isLocked } : c));
+  };
+
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">컬러 팔레트 조합</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2 flex flex-col gap-4">
-            <Label htmlFor="base-color">기준 색상 (HEX)</Label>
-            <div className="flex gap-2">
-              <div
-                className="w-10 h-10 rounded-md border"
-                style={{ backgroundColor: baseColor }}
-              ></div>
-              <Input
-                type="text"
-                id="base-color"
-                value={baseColor}
-                onChange={(e) => setBaseColor(e.target.value)}
-              />
-            </div>
-            
-            <Label className="mt-4">팔레트 유형</Label>
-            <ToggleGroup type="single" value={paletteType} onValueChange={setPaletteType} className="mt-2">
-              <ToggleGroupItem value="analogous">유사색</ToggleGroupItem>
-              <ToggleGroupItem value="complementary">보색</ToggleGroupItem>
-              <ToggleGroupItem value="triadic">3색</ToggleGroupItem>
-            </ToggleGroup>
-
-            <Button onClick={generatePalette} className="mt-4">팔레트 생성</Button>
-          </div>
-
-          <div className="md:w-1/2 flex flex-wrap gap-4 items-center justify-center border rounded-md p-6">
-            {palette.length > 0 ? (
-              palette.map((color, index) => (
-                <div
-                  key={index}
-                  className="w-16 h-16 rounded-md border"
-                  style={{ backgroundColor: color }}
-                ></div>
-              ))
-            ) : (
-              <p className="text-muted-foreground">팔레트를 생성해주세요.</p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex w-full h-[80vh]">
+      {palette.map((color, index) => (
+        <ColorBlock
+          key={color.id}
+          color={color.hex}
+          onColorChange={() => {}}
+          onRemove={() => handleRemove(color.id)}
+          onLock={() => handleLock(color.id)}
+          isLocked={color.isLocked}
+        />
+      ))}
+    </div>
   );
 }
