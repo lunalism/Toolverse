@@ -12,6 +12,7 @@ import { colord, extend, Colord } from 'colord';
 import harmonies from 'colord/plugins/harmonies';
 import mixPlugin from 'colord/plugins/mix';
 import React from 'react';
+import { toast } from 'sonner';
 
 extend([harmonies, mixPlugin]);
 
@@ -26,12 +27,13 @@ interface ColorBlockProps {
   onRemove: (id: number) => void;
   onLock: (id: number) => void;
   onCopy: (hex: string) => void;
+  onMix: (id: number) => void;
+  onHover: () => void;
 }
 
-// 각 색상 블록을 위한 독립적인 컴포넌트
-function ColorBlock({ color, onRemove, onLock, onCopy }: ColorBlockProps) {
+function ColorBlock({ color, onRemove, onLock, onCopy, onMix, onHover }: ColorBlockProps) {
   const getContrastTextColor = (hex: string) => colord(hex).isLight() ? 'text-black' : 'text-white';
-  const colorName = "색상 이름"; // TODO: 색상 이름 로직 추가
+  const colorName = "색상 이름";
 
   return (
     <div
@@ -102,9 +104,16 @@ export function PaletteGenerator() {
   };
   const handleCopy = (hex: string) => {
     navigator.clipboard.writeText(hex);
+    toast("색상 복사 완료!", {
+      description: `${hex}가 클립보드에 복사되었습니다.`,
+      duration: 3000,
+    });
   };
   
-  const handleMix = (index: number) => {
+  const handleMix = (id: number) => {
+    const index = palette.findIndex(c => c.id === id);
+    if (index === -1) return;
+
     const color1 = colord(palette[index].hex);
     const color2 = colord(palette[index + 1].hex);
     const mixedColor = color1.mix(color2, 0.5).toHex();
@@ -119,8 +128,29 @@ export function PaletteGenerator() {
     setPalette(newPalette);
   };
 
+  const handleMixAtStart = () => {
+    if (palette.length === 0) return;
+    const newColor = colord(palette[0].hex).mix(colord('#ffffff'), 0.5).toHex();
+    const newId = Math.max(...palette.map(c => c.id)) + 1;
+    setPalette([{ id: newId, hex: newColor, isLocked: false }, ...palette]);
+  };
+  
+  const handleMixAtEnd = () => {
+    if (palette.length === 0) return;
+    const lastColor = palette[palette.length - 1];
+    const newColor = colord(lastColor.hex).mix(colord('#ffffff'), 0.5).toHex();
+    const newId = Math.max(...palette.map(c => c.id)) + 1;
+    setPalette([...palette, { id: newId, hex: newColor, isLocked: false }]);
+  };
+
   return (
-    <div className="flex w-full h-[80vh] overflow-x-auto">
+    <div className="flex w-full h-[80vh] overflow-x-auto relative">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleMixAtStart}>
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
+
       {palette.map((color, index) => (
         <React.Fragment key={color.id}>
           <ColorBlock
@@ -130,14 +160,20 @@ export function PaletteGenerator() {
             onCopy={handleCopy}
           />
           {index < palette.length - 1 && (
-            <div className="relative flex items-center justify-center h-full w-0 opacity-0 hover:w-12 hover:opacity-100 transition-all duration-300">
-              <Button size="icon" className="h-8 w-8 rounded-full z-10" onClick={() => handleMix(index)}>
+            <div className="relative flex items-center justify-center h-full w-0 opacity-0 group-hover:w-12 group-hover:opacity-100 transition-all duration-300">
+              <Button size="icon" className="h-8 w-8 rounded-full z-10" onClick={() => handleMix(color.id)}>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
           )}
         </React.Fragment>
       ))}
+
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleMixAtEnd}>
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
     </div>
   );
 }
