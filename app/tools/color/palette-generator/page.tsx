@@ -4,7 +4,7 @@ import { PaletteGenerator } from '@/components/tools/palette-generator';
 
 export default function PaletteGeneratorPage() {
     return (
-        <div className="container py-10 max-w-5xl mx-auto">
+        <div className="container py-10 max-w-7xl mx-auto">
             <PaletteGenerator />
         </div>
     );

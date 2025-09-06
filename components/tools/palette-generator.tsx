@@ -2,161 +2,187 @@
 
 "use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Plus, Minus, Lock, Unlock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { colord, extend, Colord } from 'colord';
+import harmonies from 'colord/plugins/harmonies';
+import mixPlugin from 'colord/plugins/mix';
+import React from 'react';
+import { toast } from 'sonner';
 
-// --- 핵심 색상 변환 로직 (라이브러리 없이 직접 구현) ---
+extend([harmonies, mixPlugin]);
 
-// HEX 색상을 HSL 색상으로 변환하는 함수
-function hexToHsl(hex: string) {
-  let r = parseInt(hex.substring(1, 3), 16) / 255;
-  let g = parseInt(hex.substring(3, 5), 16) / 255;
-  let b = parseInt(hex.substring(5, 7), 16) / 255;
-
-  let max = Math.max(r, g, b);
-  let min = Math.min(r, g, b);
-  let h = 0;
-  let s = 0;
-  let l = (max + min) / 2;
-
-  if (max !== min) {
-    let d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch (max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-
-  return [h * 360, s * 100, l * 100];
+interface Color {
+  id: number;
+  hex: string;
+  isLocked: boolean;
 }
 
-// HSL 색상을 HEX 색상으로 변환하는 함수
-function hslToHex(h: number, s: number, l: number) {
-  h /= 360;
-  s /= 100;
-  l /= 100;
-  
-  let r, g, b;
+interface ColorBlockProps {
+  color: Color;
+  onRemove: (id: number) => void;
+  onLock: (id: number) => void;
+  onCopy: (hex: string) => void;
+  onMix: (id: number) => void;
+  hasAddButton: boolean;
+  onAdd: (id: number) => void; // + 버튼 클릭 핸들러 추가
+}
 
-  if (s === 0) {
-    r = g = b = l; // 단색조
-  } else {
-    const hue2rgb = (p: number, q: number, t: number) => {
-      if (t < 0) t += 1;
-      if (t > 1) t -= 1;
-      if (t < 1 / 6) return p + (q - p) * 6 * t;
-      if (t < 1 / 2) return q;
-      if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-      return p;
-    };
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    r = hue2rgb(p, q, h + 1 / 3);
-    g = hue2rgb(p, q, h);
-    b = hue2rgb(p, q, h - 1 / 3);
-  }
+function ColorBlock({ color, onRemove, onLock, onCopy, onMix, hasAddButton, onAdd }: ColorBlockProps) {
+  const getContrastTextColor = (hex: string) => colord(hex).isLight() ? 'text-black' : 'text-white';
+  const colorName = "색상 이름";
 
-  const toHex = (c: number) => {
-    const hex = Math.round(c * 255).toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  return (
+    <div
+      className="relative flex-1 flex flex-col justify-end p-4 transition-all duration-300 group"
+      style={{ backgroundColor: color.hex }}
+    >
+      <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 absolute top-4 left-4 right-4">
+        <Button size="icon" variant="ghost" className="text-white hover:text-red-500" onClick={() => onRemove(color.id)}>
+          <Minus className="h-4 w-4" />
+        </Button>
+        <div className="flex items-center space-x-2">
+          <Button size="icon" variant="ghost" className="text-white hover:text-gray-300" onClick={() => onCopy(color.hex)}>
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="text-white hover:text-gray-300" onClick={() => onLock(color.id)}>
+            {color.isLocked ? <Lock className="h-4 w-4" /> : <Unlock className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center">
+        <span className="font-mono text-lg font-bold transition-colors duration-300" style={{ color: getContrastTextColor(color.hex) === 'text-white' ? 'white' : 'black' }}>
+          {color.hex.toUpperCase()}
+        </span>
+        <span className="font-normal text-sm font-sans transition-colors duration-300" style={{ color: getContrastTextColor(color.hex) === 'text-white' ? 'white' : 'black' }}>
+          {colorName}
+        </span>
+      </div>
+      
+      {/* 블록 사이의 + 버튼 */}
+      {hasAddButton && (
+        <div className="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+          <Button size="icon" className="h-8 w-8 rounded-full" onClick={() => onAdd(color.id)}>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function PaletteGenerator() {
-  const [baseColor, setBaseColor] = useState('#10b981');
-  const [palette, setPalette] = useState<string[]>([]);
+  const [palette, setPalette] = useState<Color[]>([
+    { id: 1, hex: '#87A878', isLocked: false },
+    { id: 2, hex: '#B0BC98', isLocked: false },
+    { id: 3, hex: '#BCC4A9', isLocked: false },
+    { id: 4, hex: '#C7CCB9', isLocked: false },
+    { id: 5, hex: '#CAE2BC', isLocked: false },
+  ]);
   const [paletteType, setPaletteType] = useState('analogous');
 
-  const generatePalette = () => {
-    // 6자리 HEX 코드가 아닐 경우 오류 처리
-    if (!/^#[0-9A-F]{6}$/i.test(baseColor)) {
-        alert('유효한 6자리 HEX 색상 코드를 입력해주세요.');
-        setPalette([]);
-        return;
-    }
-    
-    let [h, s, l] = hexToHsl(baseColor);
-    let newPalette: string[] = [];
+  const generateRandomPalette = () => {
+    setPalette(palette.map(color => {
+      if (color.isLocked) return color;
+      return { ...color, hex: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}` };
+    }));
+  };
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        generateRandomPalette();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [palette]);
 
-    // 팔레트 유형에 따라 HSL 값을 조작합니다.
-    if (paletteType === 'analogous') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 30) % 360, s, l),
-        hslToHex((h - 30 + 360) % 360, s, l),
-      ];
-    } else if (paletteType === 'complementary') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 180) % 360, s, l),
-      ];
-    } else if (paletteType === 'triadic') {
-      newPalette = [
-        hslToHex(h, s, l),
-        hslToHex((h + 120) % 360, s, l),
-        hslToHex((h - 120 + 360) % 360, s, l),
-      ];
-    }
+  const handleRemove = (id: number) => {
+    setPalette(palette.filter(c => c.id !== id));
+  };
+  const handleLock = (id: number) => {
+    setPalette(palette.map(c => c.id === id ? { ...c, isLocked: !c.isLocked } : c));
+  };
+  const handleCopy = (hex: string) => {
+    navigator.clipboard.writeText(hex);
+    toast("색상 복사 완료!", {
+      description: `${hex}가 클립보드에 복사되었습니다.`,
+      duration: 3000,
+    });
+  };
+  
+  const handleMix = (id: number, insertAtIndex: number) => {
+    const color1 = colord(palette[insertAtIndex].hex);
+    const color2 = colord(palette[insertAtIndex + 1].hex);
+    const mixedColor = color1.mix(color2, 0.5).toHex();
+    
+    const newId = Math.max(...palette.map(c => c.id)) + 1;
+    const newPalette = [
+      ...palette.slice(0, insertAtIndex + 1),
+      { id: newId, hex: mixedColor, isLocked: false },
+      ...palette.slice(insertAtIndex + 1),
+    ];
     
     setPalette(newPalette);
   };
+  
+  const handleAddAtStart = () => {
+    const newColor = colord(palette[0].hex).mix(colord('#ffffff'), 0.5).toHex();
+    const newId = Math.max(...palette.map(c => c.id)) + 1;
+    setPalette([{ id: newId, hex: newColor, isLocked: false }, ...palette]);
+  };
+  
+  const handleAddAtEnd = () => {
+    const newColor = colord(palette[palette.length - 1].hex).mix(colord('#ffffff'), 0.5).toHex();
+    const newId = Math.max(...palette.map(c => c.id)) + 1;
+    setPalette([...palette, { id: newId, hex: newColor, isLocked: false }]);
+  };
+  
+  const handleAddBetween = (id: number) => {
+    const index = palette.findIndex(c => c.id === id);
+    if (index === -1) return;
+    handleMix(id, index);
+  }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl">컬러 팔레트 조합</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="md:w-1/2 flex flex-col gap-4">
-            <Label htmlFor="base-color">기준 색상 (HEX)</Label>
-            <div className="flex gap-2">
-              <div
-                className="w-10 h-10 rounded-md border"
-                style={{ backgroundColor: baseColor }}
-              ></div>
-              <Input
-                type="text"
-                id="base-color"
-                value={baseColor}
-                onChange={(e) => setBaseColor(e.target.value)}
-              />
+    <div className="flex w-full h-[80vh] overflow-x-auto relative">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleAddAtStart}>
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
+
+      {palette.map((color, index) => (
+        <React.Fragment key={color.id}>
+          <ColorBlock
+            hasAddButton={index < palette.length - 1}
+            onAdd={handleAddBetween}
+            color={color}
+            onRemove={handleRemove}
+            onLock={handleLock}
+            onCopy={handleCopy}
+            onMix={(id) => handleMix(id, palette.findIndex(c => c.id === id))}
+          />
+          {index < palette.length - 1 && (
+            <div className="relative flex items-center justify-center h-full w-0 opacity-0 hover:w-12 hover:opacity-100 transition-all duration-300">
+              <Button size="icon" className="h-8 w-8 rounded-full z-10" onClick={() => handleMix(color.id, index)}>
+                <Plus className="h-4 w-4" />
+              </Button>
             </div>
-            
-            <Label className="mt-4">팔레트 유형</Label>
-            <ToggleGroup type="single" value={paletteType} onValueChange={setPaletteType} className="mt-2">
-              <ToggleGroupItem value="analogous">유사색</ToggleGroupItem>
-              <ToggleGroupItem value="complementary">보색</ToggleGroupItem>
-              <ToggleGroupItem value="triadic">3색</ToggleGroupItem>
-            </ToggleGroup>
+          )}
+        </React.Fragment>
+      ))}
 
-            <Button onClick={generatePalette} className="mt-4">팔레트 생성</Button>
-          </div>
-
-          <div className="md:w-1/2 flex flex-wrap gap-4 items-center justify-center border rounded-md p-6">
-            {palette.length > 0 ? (
-              palette.map((color, index) => (
-                <div
-                  key={index}
-                  className="w-16 h-16 rounded-md border"
-                  style={{ backgroundColor: color }}
-                ></div>
-              ))
-            ) : (
-              <p className="text-muted-foreground">팔레트를 생성해주세요.</p>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleAddAtEnd}>
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
+    </div>
   );
 }
