@@ -31,47 +31,47 @@ export function Header() {
                         <NavigationMenuList className="flex gap-1">
                             <NavigationMenuItem>
                                 <Link href="/tools/text" className={navigationMenuTriggerStyle()}>
-                                텍스트 도구
+                                    텍스트 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="/tools/date-time" className={navigationMenuTriggerStyle()}>
-                                날짜/시간 도구
+                                    날짜/시간 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="/tools/security" className={navigationMenuTriggerStyle()}>
-                                보안 도구
+                                    보안 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
-                                네트워크 도구
+                                <Link href="/tools/network" className={navigationMenuTriggerStyle()}>
+                                    네트워크 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="/tools/color" className={navigationMenuTriggerStyle()}>
-                                색상 도구
+                                    색상 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="#" className={navigationMenuTriggerStyle()}>
-                                PDF 도구
+                                    PDF 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="#" className={navigationMenuTriggerStyle()}>
-                                이미지 도구
+                                    이미지 도구
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="#" className={navigationMenuTriggerStyle()}>
-                                미디어 툴
+                                    미디어 툴
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
                                 <Link href="#" className={navigationMenuTriggerStyle()}>
-                                유틸리티 툴
+                                    유틸리티 툴
                                 </Link>
                             </NavigationMenuItem>
                         </NavigationMenuList>
