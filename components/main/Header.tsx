@@ -55,7 +55,7 @@ export function Header() {
                                 </Link>
                             </NavigationMenuItem>
                             <NavigationMenuItem>
-                                <Link href="#" className={navigationMenuTriggerStyle()}>
+                                <Link href="/tools/pdf" className={navigationMenuTriggerStyle()}>
                                     PDF 도구
                                 </Link>
                             </NavigationMenuItem>
