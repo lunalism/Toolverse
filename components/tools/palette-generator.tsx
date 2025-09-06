@@ -5,9 +5,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Minus, Lock, Unlock, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { colord, extend, Colord } from 'colord';
 import harmonies from 'colord/plugins/harmonies';
 import mixPlugin from 'colord/plugins/mix';
@@ -28,10 +25,11 @@ interface ColorBlockProps {
   onLock: (id: number) => void;
   onCopy: (hex: string) => void;
   onMix: (id: number) => void;
-  onHover: () => void;
+  hasAddButton: boolean;
+  onAdd: (id: number) => void; // + 버튼 클릭 핸들러 추가
 }
 
-function ColorBlock({ color, onRemove, onLock, onCopy, onMix, onHover }: ColorBlockProps) {
+function ColorBlock({ color, onRemove, onLock, onCopy, onMix, hasAddButton, onAdd }: ColorBlockProps) {
   const getContrastTextColor = (hex: string) => colord(hex).isLight() ? 'text-black' : 'text-white';
   const colorName = "색상 이름";
 
@@ -62,12 +60,20 @@ function ColorBlock({ color, onRemove, onLock, onCopy, onMix, onHover }: ColorBl
           {colorName}
         </span>
       </div>
+      
+      {/* 블록 사이의 + 버튼 */}
+      {hasAddButton && (
+        <div className="absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+          <Button size="icon" className="h-8 w-8 rounded-full" onClick={() => onAdd(color.id)}>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
 
 export function PaletteGenerator() {
-  const [baseColor, setBaseColor] = useState('#10b981');
   const [palette, setPalette] = useState<Color[]>([
     { id: 1, hex: '#87A878', isLocked: false },
     { id: 2, hex: '#B0BC98', isLocked: false },
@@ -110,43 +116,43 @@ export function PaletteGenerator() {
     });
   };
   
-  const handleMix = (id: number) => {
-    const index = palette.findIndex(c => c.id === id);
-    if (index === -1) return;
-
-    const color1 = colord(palette[index].hex);
-    const color2 = colord(palette[index + 1].hex);
+  const handleMix = (id: number, insertAtIndex: number) => {
+    const color1 = colord(palette[insertAtIndex].hex);
+    const color2 = colord(palette[insertAtIndex + 1].hex);
     const mixedColor = color1.mix(color2, 0.5).toHex();
     
     const newId = Math.max(...palette.map(c => c.id)) + 1;
     const newPalette = [
-      ...palette.slice(0, index + 1),
+      ...palette.slice(0, insertAtIndex + 1),
       { id: newId, hex: mixedColor, isLocked: false },
-      ...palette.slice(index + 1),
+      ...palette.slice(insertAtIndex + 1),
     ];
     
     setPalette(newPalette);
   };
-
-  const handleMixAtStart = () => {
-    if (palette.length === 0) return;
+  
+  const handleAddAtStart = () => {
     const newColor = colord(palette[0].hex).mix(colord('#ffffff'), 0.5).toHex();
     const newId = Math.max(...palette.map(c => c.id)) + 1;
     setPalette([{ id: newId, hex: newColor, isLocked: false }, ...palette]);
   };
   
-  const handleMixAtEnd = () => {
-    if (palette.length === 0) return;
-    const lastColor = palette[palette.length - 1];
-    const newColor = colord(lastColor.hex).mix(colord('#ffffff'), 0.5).toHex();
+  const handleAddAtEnd = () => {
+    const newColor = colord(palette[palette.length - 1].hex).mix(colord('#ffffff'), 0.5).toHex();
     const newId = Math.max(...palette.map(c => c.id)) + 1;
     setPalette([...palette, { id: newId, hex: newColor, isLocked: false }]);
   };
+  
+  const handleAddBetween = (id: number) => {
+    const index = palette.findIndex(c => c.id === id);
+    if (index === -1) return;
+    handleMix(id, index);
+  }
 
   return (
     <div className="flex w-full h-[80vh] overflow-x-auto relative">
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleMixAtStart}>
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleAddAtStart}>
           <Plus className="h-6 w-6" />
         </Button>
       </div>
@@ -154,14 +160,17 @@ export function PaletteGenerator() {
       {palette.map((color, index) => (
         <React.Fragment key={color.id}>
           <ColorBlock
+            hasAddButton={index < palette.length - 1}
+            onAdd={handleAddBetween}
             color={color}
             onRemove={handleRemove}
             onLock={handleLock}
             onCopy={handleCopy}
+            onMix={(id) => handleMix(id, palette.findIndex(c => c.id === id))}
           />
           {index < palette.length - 1 && (
-            <div className="relative flex items-center justify-center h-full w-0 opacity-0 group-hover:w-12 group-hover:opacity-100 transition-all duration-300">
-              <Button size="icon" className="h-8 w-8 rounded-full z-10" onClick={() => handleMix(color.id)}>
+            <div className="relative flex items-center justify-center h-full w-0 opacity-0 hover:w-12 hover:opacity-100 transition-all duration-300">
+              <Button size="icon" className="h-8 w-8 rounded-full z-10" onClick={() => handleMix(color.id, index)}>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
@@ -169,8 +178,8 @@ export function PaletteGenerator() {
         </React.Fragment>
       ))}
 
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleMixAtEnd}>
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 hover:opacity-100 transition-opacity duration-300">
+        <Button size="icon" className="h-10 w-10 rounded-full" onClick={handleAddAtEnd}>
           <Plus className="h-6 w-6" />
         </Button>
       </div>
